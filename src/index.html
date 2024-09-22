@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de ToDos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de ToDos</h1>
+
+        <!-- Formulario para agregar ToDos -->
+        <form id="todoForm">
+            <input type="text" id="todoInput" placeholder="Nueva tarea" required />
+            <button type="submit">Agregar</button>
+        </form>
+
+        <h2>Tareas</h2>
+        <ul id="todoList"></ul>
+    </div>
+
+    <script>
+        const form = document.getElementById('todoForm');
+        const todoList = document.getElementById('todoList');
+
+        // Función para obtener los ToDos desde el backend
+        const fetchTodos = async () => {
+            const response = await fetch('/todos');
+            const todos = await response.json();
+            todoList.innerHTML = '';
+            todos.forEach((todo, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${todo}</span>
+                    <button class="complete-btn" onclick="completeTodo(${index})">✔</button>
+                    <button class="delete-btn" onclick="deleteTodo(${index})">🗑</button>
+                `;
+                todoList.appendChild(li);
+            });
+        };
+
+        // Llamada inicial para cargar los ToDos al cargar la página
+        fetchTodos();
+
+        // Función para agregar un ToDo
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const todo = document.getElementById('todoInput').value;
+
+            // Enviar el nuevo ToDo al backend
+            await fetch('/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ task: todo }),
+            });
+
+            // Limpiar el input y recargar la lista de ToDos
+            document.getElementById('todoInput').value = '';
+            fetchTodos();
+        });
+
+        // Función para completar un ToDo
+        const completeTodo = async (index) => {
+            await fetch(`/todos/${index}/complete`, { method: 'PUT' });
+            fetchTodos();
+        };
+
+        // Función para eliminar un ToDo
+        const deleteTodo = async (index) => {
+            await fetch(`/todos/${index}`, { method: 'DELETE' });
+            fetchTodos();
+        };
+    </script>
+</body>
+</html>
