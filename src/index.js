@@ -62,6 +62,19 @@ app.put('/todos/:index/complete', async (req, res) => {
   }
 });
 
+// Ruta para deshacer una tarea completada (quitar el "✅")
+app.put('/todos/:index/undo', async (req, res) => {
+  try {
+    const index = req.params.index;
+    const todos = await redisClient.lRange('todos', 0, -1);
+    const task = todos[index].replace('✅ ', ''); // Quitar el "✅"
+    await redisClient.lSet('todos', index, task);
+    res.json({ message: 'Tarea deshecha' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al deshacer la tarea' });
+  }
+});
+
 // Ruta para eliminar una tarea
 app.delete('/todos/:index', async (req, res) => {
   try {

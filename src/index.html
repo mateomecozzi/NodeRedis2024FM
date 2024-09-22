@@ -30,10 +30,13 @@
             const todos = await response.json();
             todoList.innerHTML = '';
             todos.forEach((todo, index) => {
+                const isCompleted = todo.startsWith('✅');
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <span>${todo}</span>
-                    <button class="complete-btn" onclick="completeTodo(${index})">✔</button>
+                    <button class="complete-btn" onclick="completeTodo(${index}, '${todo}')">
+                        ${isCompleted ? '↩️' : '✔'}
+                    </button>
                     <button class="delete-btn" onclick="deleteTodo(${index})">🗑</button>
                 `;
                 todoList.appendChild(li);
@@ -62,9 +65,11 @@
             fetchTodos();
         });
 
-        // Función para completar un ToDo
-        const completeTodo = async (index) => {
-            await fetch(`/todos/${index}/complete`, { method: 'PUT' });
+        // Función para completar o deshacer un ToDo
+        const completeTodo = async (index, task) => {
+            const isCompleted = task.startsWith('✅');
+            const url = `/todos/${index}/${isCompleted ? 'undo' : 'complete'}`;
+            await fetch(url, { method: 'PUT' });
             fetchTodos();
         };
 
