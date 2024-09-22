@@ -12,19 +12,29 @@ services:
   server:
     build:
       context: .
+      dockerfile: Dockerfile  # Especificamos el Dockerfile si es necesario
+    image: mi-app-node:1.0  # Definir el nombre y la etiqueta de la imagen para la app
+    container_name: app-contenedor  # Nombre del contenedor de la app
     environment:
       NODE_ENV: production
     ports:
-      - "3000:3000"
+      - "3000:3000"  # Puerto de la app
     depends_on:
-      - redis  # Asegura que Redis esté corriendo antes de levantar el server
+      - redis  # Garantiza que Redis esté corriendo antes de levantar el server
+    networks:
+      - app-network  # Usamos la misma red para que ambos servicios puedan comunicarse
 
   redis:
-    image: "redis/redis-stack"
-    container_name: redis-todo
+    image: redis/redis-stack  # Usar la imagen oficial de Redis Stack
+    container_name: redis-todo  # Nombre del contenedor de Redis
     ports:
-      - "8001:6379"  # Exponemos Redis en el puerto 8001
+      - "8001:6379"  # Exponemos Redis en el puerto 8001 (mapeado al 6379 interno)
+    networks:
+      - app-network  # La misma red que el servicio app para que se puedan comunicar
 
+networks:
+  app-network:
+    driver: bridge  # Definimos una red bridge para la comunicación entre servicios
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
