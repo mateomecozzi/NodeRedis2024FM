@@ -16,6 +16,9 @@ redisClient.on('error', (err) => console.log('Redis Client Error', err));
 // Middleware para parsear JSON
 app.use(express.json());
 
+// Variable de entorno para identificar la instancia
+const instanceId = process.env.INSTANCE_ID || 'default-instance';
+
 // Sirviendo archivos estáticos (como el CSS)
 app.use(express.static(path.join(__dirname)));
 
@@ -90,10 +93,15 @@ app.delete('/todos/:index', async (req, res) => {
   }
 });
 
+// Nueva ruta para mostrar qué instancia estás viendo
+app.get('/instance', (req, res) => {
+  res.send(`<h1>Estás viendo la instancia: ${instanceId}</h1>`);
+});
+
 // Conectar a Redis y arrancar el servidor
 (async () => {
   await redisClient.connect();
   app.listen(port, () => {
-    console.log(`Servidor escuchando en http://localhost:${port}`);
+    console.log(`Servidor escuchando en http://localhost:${port} - Instancia: ${instanceId}`);
   });
 })();

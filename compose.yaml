@@ -9,32 +9,63 @@
 # https://github.com/docker/awesome-compose
 version: '3'
 services:
-  server:
+  app1:
     build:
       context: .
-      dockerfile: Dockerfile  # Especificamos el Dockerfile si es necesario
-    image: mi-app-node:1.0  # Definir el nombre y la etiqueta de la imagen para la app
-    container_name: app-contenedor  # Nombre del contenedor de la app
+      dockerfile: Dockerfile
+    image: mi-app-node:1.0  # Imagen personalizada de la app
+    container_name: app1
     environment:
       NODE_ENV: production
+      INSTANCE_ID: app1
     ports:
-      - "3000:3000"  # Puerto de la app
+      - "3001:3000"  # Mapeamos el puerto 3001 en el host al puerto 3000 del contenedor
     depends_on:
-      - redis  # Garantiza que Redis esté corriendo antes de levantar el server
+      - redis  # Garantiza que Redis esté corriendo antes de levantar la app
     networks:
-      - app-network  # Usamos la misma red para que ambos servicios puedan comunicarse
+      - app-network
+
+  app2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mi-app-node:1.0  # Usamos la misma imagen
+    container_name: app2
+    environment:
+      NODE_ENV: production
+      INSTANCE_ID: app2
+    ports:
+      - "3002:3000"  # Mapeamos el puerto 3002 en el host al puerto 3000 del contenedor
+    depends_on:
+      - redis
+    networks:
+      - app-network
 
   redis:
-    image: redis/redis-stack  # Usar la imagen oficial de Redis Stack
-    container_name: redis-todo  # Nombre del contenedor de Redis
+    image: redis/redis-stack
+    container_name: server-redis
     ports:
-      - "8001:6379"  # Exponemos Redis en el puerto 8001 (mapeado al 6379 interno)
+      - "8001:6379"
     networks:
-      - app-network  # La misma red que el servicio app para que se puedan comunicar
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"  # Nginx escuchará en el puerto 80 del host
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Montamos el archivo de configuración de Nginx
+    depends_on:
+      - app1
+      - app2
+    networks:
+      - app-network
 
 networks:
   app-network:
-    driver: bridge  # Definimos una red bridge para la comunicación entre servicios
+    driver: bridge  # Usamos una red bridge para la comunicación
+
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
