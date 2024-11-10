@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']  # Prometheus monitoreándose a sí mismo
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']   # Asegúrate de que el nombre coincida con el nombre del servicio en docker-compose
+
+  - job_name: 'app-metrics'
+    static_configs:
+      - targets: ['app1:3000', 'app2:3000']  # Puntos de entrada para las métricas personalizadas de app1 y app2

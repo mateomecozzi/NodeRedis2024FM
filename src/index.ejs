@@ -21,24 +21,34 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Lista de ToDos</h1>
+    <div class="main-container">
 
-        <!-- Formulario para agregar ToDos -->
-        <form id="todoForm">
-            <input type="text" id="todoInput" placeholder="Nueva tarea" required />
-            <button type="submit">Agregar</button>
-        </form>
-
-        <h2>Tareas</h2>
-        <ul id="todoList"></ul>
+        <div class="container">
+            <h1>Lista de ToDos</h1>
+    
+            <!-- Formulario para agregar ToDos -->
+            <form id="todoForm">
+                <input type="text" id="todoInput" placeholder="Nueva tarea" required />
+                <button type="submit">Agregar</button>
+            </form>
+    
+            <h2>Tareas</h2>
+            <ul id="todoList"></ul>
+        </div>
+        <br>
+        <!-- Sección para la tarea intensiva en CPU -->
+        <div class="cpu-task-container">
+            <label for="iterations">Número de iteraciones:</label>
+            <input type="number" id="iterations" placeholder="Ej. 10000000">
+            <button onclick="runCpuIntensiveTask()" class="btn">Ejecutar tarea costosa en CPU</button>
+            <p id="result"></p>
+        </div>
+    
+        <!-- Etiqueta que muestra la instancia con el valor dinámico -->
+        <div class="instance-label">
+            <span id="instanceText"><%= instanceId %></span>
+        </div>
     </div>
-
-    <!-- Etiqueta que muestra la instancia con el valor dinámico -->
-    <div class="instance-label">
-        <span id="instanceText"><%= instanceId %></span>
-    </div>
-
     <script>
         const form = document.getElementById('todoForm');
         const todoList = document.getElementById('todoList');
@@ -90,6 +100,23 @@
             await fetch(`/todos/${index}`, { method: 'DELETE' });
             fetchTodos();
         };
+        function runCpuIntensiveTask() {
+            const iterations = document.getElementById('iterations').value;
+            if (!iterations) {
+                alert("Por favor, introduce un número de iteraciones.");
+                return;
+            }
+
+            fetch(`/cpu-intensive-task?iterations=${iterations}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('result').innerText = data;
+                })
+                .catch(error => {
+                    console.error("Error al ejecutar la tarea intensiva:", error);
+                    document.getElementById('result').innerText = "Error al ejecutar la tarea.";
+                });
+        }
     </script>
 </body>
 </html>

@@ -16,6 +16,13 @@ body {
     padding: 20px;
 }
 
+.main-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .container {
     background-color: #333; /* Contenedor gris oscuro ligeramente más claro */
     border-radius: 10px;
@@ -112,4 +119,29 @@ li span {
 
 .delete-btn:hover {
     color: #c82333;
+}
+
+.cpu-task-container {
+    max-width: 400px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.cpu-task-container label {
+    margin-right: 10px;
+    color: #fff;
+}
+
+.cpu-task-container input[type="number"] {
+    width: 150px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
 }
