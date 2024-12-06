@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis/redis-stack:latest
+        ports:
+        - containerPort: 6379
+        env:
+        - name: REDIS_PASSWORD
+          value: "1597"  # Si deseas agregar un password de seguridad para Redis (opcional)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: nicofarizano/tpfdevops:2.0  # Imagen actualizada
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: INSTANCE_ID
+          value: "app1"
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"  # Configuración para conectar con el servicio de Redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: app
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30001   # Exponiendo en el puerto 30001
+  type: NodePort  # Cambiado de ClusterIP a NodePort

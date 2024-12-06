@@ -46,7 +46,11 @@
     
         <!-- Etiqueta que muestra la instancia con el valor dinámico -->
         <div class="instance-label">
-            <span id="instanceText"><%= instanceId %></span>
+            <% if (instanceId === 'app1') { %>
+                <span>app2</span>
+            <% } else { %>
+                <span>app1</span>
+            <% } %>
         </div>
     </div>
     <script>
