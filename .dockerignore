@@ -32,3 +32,8 @@
 **/dist
 LICENSE
 README.md
+nginx/
+composeViejo.yaml
+packageViejo.json
+prometheus.yml
+src/indexViejo.js
